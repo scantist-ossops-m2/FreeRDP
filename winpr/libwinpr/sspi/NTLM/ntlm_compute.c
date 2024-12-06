@@ -122,6 +122,9 @@ void ntlm_print_version_info(NTLM_VERSION_INFO* versionInfo)
 int ntlm_read_ntlm_v2_client_challenge(wStream* s, NTLMv2_CLIENT_CHALLENGE* challenge)
 {
 	size_t size;
+	if (Stream_GetRemainingLength(s) < 28)
+		return -1;
+
 	Stream_Read_UINT8(s, challenge->RespType);
 	Stream_Read_UINT8(s, challenge->HiRespType);
 	Stream_Read_UINT16(s, challenge->Reserved1);
@@ -156,6 +159,8 @@ int ntlm_write_ntlm_v2_client_challenge(wStream* s, NTLMv2_CLIENT_CHALLENGE* cha
 
 int ntlm_read_ntlm_v2_response(wStream* s, NTLMv2_RESPONSE* response)
 {
+	if (Stream_GetRemainingLength(s) < 16)
+		return -1;
 	Stream_Read(s, response->Response, 16);
 	return ntlm_read_ntlm_v2_client_challenge(s, &(response->Challenge));
 }
