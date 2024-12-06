@@ -109,6 +109,9 @@ static BOOL update_read_bitmap_data(rdpUpdate* update, wStream* s,
 	{
 		if (!(bitmapData->flags & NO_BITMAP_COMPRESSION_HDR))
 		{
+			if (Stream_GetRemainingLength(s) < 8)
+				return FALSE;
+
 			Stream_Read_UINT16(s,
 			                   bitmapData->cbCompFirstRowSize); /* cbCompFirstRowSize (2 bytes) */
 			Stream_Read_UINT16(s,
@@ -634,7 +637,7 @@ BOOL update_recv(rdpUpdate* update, wStream* s)
 	}
 
 	Stream_Read_UINT16(s, updateType); /* updateType (2 bytes) */
-	WLog_Print(update->log, WLOG_TRACE, "%s Update Data PDU", UPDATE_TYPE_STRINGS[updateType]);
+	WLog_Print(update->log, WLOG_TRACE, "%s Update Data PDU", update_type_to_string(updateType));
 
 	if (!IFCALLRESULT(TRUE, update->BeginPaint, context))
 		return FALSE;
