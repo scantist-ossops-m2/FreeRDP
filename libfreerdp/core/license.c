@@ -1226,6 +1226,9 @@ BOOL license_read_new_or_upgrade_license_packet(rdpLicense* license, wStream* s)
 	if (!licenseStream)
 		goto out_free_blob;
 
+	if (Stream_GetRemainingLength(licenseStream) < 8)
+		goto out_free_stream;
+
 	Stream_Read_UINT16(licenseStream, os_minor);
 	Stream_Read_UINT16(licenseStream, os_major);
 
@@ -1240,6 +1243,8 @@ BOOL license_read_new_or_upgrade_license_packet(rdpLicense* license, wStream* s)
 	Stream_Seek(licenseStream, cbScope);
 
 	/* CompanyName */
+	if (Stream_GetRemainingLength(licenseStream) < 4)
+		goto out_free_stream;
 	Stream_Read_UINT32(licenseStream, cbCompanyName);
 	if (Stream_GetRemainingLength(licenseStream) < cbCompanyName)
 		goto out_free_stream;
@@ -1250,6 +1255,8 @@ BOOL license_read_new_or_upgrade_license_packet(rdpLicense* license, wStream* s)
 	Stream_Seek(licenseStream, cbCompanyName);
 
 	/* productId */
+	if (Stream_GetRemainingLength(licenseStream) < 4)
+		goto out_free_stream;
 	Stream_Read_UINT32(licenseStream, cbProductId);
 	if (Stream_GetRemainingLength(licenseStream) < cbProductId)
 		goto out_free_stream;
@@ -1260,6 +1267,8 @@ BOOL license_read_new_or_upgrade_license_packet(rdpLicense* license, wStream* s)
 	Stream_Seek(licenseStream, cbProductId);
 
 	/* licenseInfo */
+	if (Stream_GetRemainingLength(licenseStream) < 4)
+		goto out_free_stream;
 	Stream_Read_UINT32(licenseStream, cbLicenseInfo);
 	if (Stream_GetRemainingLength(licenseStream) < cbLicenseInfo)
 		goto out_free_stream;
