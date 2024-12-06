@@ -396,7 +396,7 @@ void glyph_cache_put(rdpGlyphCache* glyphCache, UINT32 id, UINT32 index, rdpGlyp
 		return;
 	}
 
-	if (index > glyphCache->glyphCache[id].number)
+	if (index >= glyphCache->glyphCache[id].number)
 	{
 		DEBUG_WARN( "invalid glyph cache index: %d in cache id: %d\n", index, id);
 		return;
