@@ -1730,6 +1730,9 @@ static CACHE_BITMAP_ORDER* update_read_cache_bitmap_order(rdpUpdate* update, wSt
 		}
 	}
 
+	if (cache_bitmap->bitmapLength == 0)
+		goto fail;
+
 	if (Stream_GetRemainingLength(s) < cache_bitmap->bitmapLength)
 		goto fail;
 
@@ -1863,6 +1866,9 @@ static CACHE_BITMAP_V2_ORDER* update_read_cache_bitmap_v2_order(rdpUpdate* updat
 			cache_bitmap_v2->bitmapLength = cache_bitmap_v2->cbCompMainBodySize;
 		}
 	}
+
+	if (cache_bitmap_v2->bitmapLength == 0)
+		goto fail;
 
 	if (Stream_GetRemainingLength(s) < cache_bitmap_v2->bitmapLength)
 		goto fail;
@@ -2003,7 +2009,7 @@ static CACHE_BITMAP_V3_ORDER* update_read_cache_bitmap_v3_order(rdpUpdate* updat
 	Stream_Read_UINT16(s, bitmapData->height); /* height (2 bytes) */
 	Stream_Read_UINT32(s, new_len); /* length (4 bytes) */
 
-	if (Stream_GetRemainingLength(s) < new_len)
+	if ((new_len == 0) || (Stream_GetRemainingLength(s) < new_len))
 		goto fail;
 
 	new_data = (BYTE*) realloc(bitmapData->data, new_len);
