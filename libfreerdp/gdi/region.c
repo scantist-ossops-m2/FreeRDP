@@ -37,6 +37,17 @@
 
 #define TAG FREERDP_TAG("gdi.region")
 
+static char* gdi_rect_str(char* buffer, size_t size, const HGDI_RECT rect)
+{
+	_snprintf(buffer, size - 1,
+	          "[top/left=%" PRId32 "x%" PRId32 "-bottom/right%" PRId32 "x%" PRId32 "]", rect->top,
+	          rect->left, rect->bottom, rect->right);
+	if (size > 1)
+		buffer[size - 1] = '\0'
+
+		    return buffer;
+}
+
 /**
  * Create a region from rectangular coordinates.\n
  * @msdn{dd183514}
@@ -133,10 +144,29 @@ INLINE void gdi_CRectToRgn(UINT32 left, UINT32 top,
 INLINE void gdi_RectToCRgn(const HGDI_RECT rect, UINT32* x, UINT32* y,
                            UINT32* w, UINT32* h)
 {
+	INT64 tmp;
 	*x = rect->left;
 	*y = rect->top;
-	*w = rect->right - rect->left + 1;
-	*h = rect->bottom - rect->top + 1;
+	tmp = rect->right - rect->left + 1;
+	if ((tmp < 0) || (tmp > INT32_MAX))
+	{
+		char buffer[256];
+		WLog_ERR(TAG, "[%s] rectangle invalid %s", __FUNCTION__,
+		         gdi_rect_str(buffer, sizeof(buffer), rect));
+		*w = 0;
+	}
+	else
+		*w = tmp;
+	tmp = rect->bottom - rect->top + 1;
+	if ((tmp < 0) || (tmp > INT32_MAX))
+	{
+		char buffer[256];
+		WLog_ERR(TAG, "[%s] rectangle invalid %s", __FUNCTION__,
+		         gdi_rect_str(buffer, sizeof(buffer), rect));
+		*h = 0;
+	}
+	else
+		*h = tmp;
 }
 
 /**
