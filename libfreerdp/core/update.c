@@ -97,6 +97,9 @@ static BOOL update_read_bitmap_data(rdpUpdate* update, wStream* s,
 	{
 		if (!(bitmapData->flags & NO_BITMAP_COMPRESSION_HDR))
 		{
+			if (Stream_GetRemainingLength(s) < 8)
+				return FALSE;
+
 			Stream_Read_UINT16(s,
 			                   bitmapData->cbCompFirstRowSize); /* cbCompFirstRowSize (2 bytes) */
 			Stream_Read_UINT16(s,
@@ -184,11 +187,9 @@ BOOL update_read_bitmap_update(rdpUpdate* update, wStream* s,
 
 	if (bitmapUpdate->number > bitmapUpdate->count)
 	{
-		UINT16 count;
-		BITMAP_DATA* newdata;
-		count = bitmapUpdate->number * 2;
-		newdata = (BITMAP_DATA*) realloc(bitmapUpdate->rectangles,
-		                                 sizeof(BITMAP_DATA) * count);
+		UINT32 count = bitmapUpdate->number * 2;
+		BITMAP_DATA* newdata = (BITMAP_DATA*) realloc(bitmapUpdate->rectangles,
+		                       sizeof(BITMAP_DATA) * count);
 
 		if (!newdata)
 			return FALSE;
