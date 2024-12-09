@@ -768,7 +768,7 @@ BOOL update_recv(rdpUpdate* update, wStream* s)
 	}
 
 	Stream_Read_UINT16(s, updateType); /* updateType (2 bytes) */
-	WLog_Print(update->log, WLOG_TRACE, "%s Update Data PDU", UPDATE_TYPE_STRINGS[updateType]);
+	WLog_Print(update->log, WLOG_TRACE, "%s Update Data PDU", update_type_to_string(updateType));
 
 	if (!update_begin_paint(update))
 		goto fail;
@@ -1081,7 +1081,7 @@ static int update_prepare_order_info(rdpContext* context, ORDER_INFO* orderInfo,
 	orderInfo->controlFlags = ORDER_STANDARD;
 	orderInfo->controlFlags |= ORDER_TYPE_CHANGE;
 	length += 1;
-	length += PRIMARY_DRAWING_ORDER_FIELD_BYTES[orderInfo->orderType];
+	length += get_primary_drawing_order_field_bytes(orderInfo->orderType, NULL);
 	length += update_prepare_bounds(context, orderInfo);
 	return length;
 }
@@ -1099,7 +1099,7 @@ static int update_write_order_info(rdpContext* context, wStream* s, ORDER_INFO* 
 		Stream_Write_UINT8(s, orderInfo->orderType); /* orderType (1 byte) */
 
 	update_write_field_flags(s, orderInfo->fieldFlags, orderInfo->controlFlags,
-	                         PRIMARY_DRAWING_ORDER_FIELD_BYTES[orderInfo->orderType]);
+	                         get_primary_drawing_order_field_bytes(orderInfo->orderType, NULL));
 	update_write_bounds(s, orderInfo);
 	Stream_SetPosition(s, position);
 	return 0;
